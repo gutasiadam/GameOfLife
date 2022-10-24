@@ -1,14 +1,15 @@
 package gameOfLife;
+import java.io.Serializable;
 import java.util.HashMap;
-public class Cell {
+public class Cell implements Serializable {
 	HashMap<Direction, Cell> neighbors;
 	boolean state=false;
 	boolean aliveOnNextIteration;
 	
 	boolean nextIterationSet;
 	
-	public void Cell(boolean alive) {
-		this.state=alive;
+	public Cell() {
+		this.state=false;
 	}
 	
 	public boolean isAlive() {

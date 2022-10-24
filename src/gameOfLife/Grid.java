@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Grid implements Serializable {
-	private final Cell[][] gameGrid;
+	private Cell[][] gameGrid;
 	
 	private Grid(Cell[][] grid) {
 		this.gameGrid = grid;
@@ -26,6 +26,14 @@ public class Grid implements Serializable {
 			return null;
 		}
 		
+	}
+	
+	public void setCellByPos(int row, int col, Cell c) throws IndexOutOfBoundsException{
+		try {
+			gameGrid[row][col]=c;
+		}catch(IndexOutOfBoundsException e) {
+			return;
+		}
 	}
 	
 	public HashMap<String,Cell> getCellNeighbors(int row, int col) {
