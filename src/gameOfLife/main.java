@@ -5,7 +5,6 @@ import java.awt.*;
 import java.util.Objects;
 
 public class main {
-
 	public static void main(String[] args) {
 		/*
 		 * Note: When using the app on macOS the menubar is moved to the top menubar and the default laf is preserved.
@@ -17,6 +16,7 @@ public class main {
 		Game gameOfLife= new Game();
 		AppFrame frame = new AppFrame(gameOfLife);
 		frame.setVisible(true);
+		gameOfLife.getGameGrid().printCellNeighBors(30, 20);
 	}
 
 }

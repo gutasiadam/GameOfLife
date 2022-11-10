@@ -16,12 +16,22 @@ public class Cell implements Serializable {
 		return state;
 	}
 	
+	protected void setState(boolean b) {
+		this.state=b;
+	}
+	
+	public boolean getAliveOnNextIteration() {
+		return aliveOnNextIteration;
+	}
+	
 	protected void setNextiteration(boolean state) {
 		this.aliveOnNextIteration=state;
 		this.nextIterationSet=true;
 	}
 	
-	public void Tick() {
+
+	
+	public void Step() {
 		this.state=this.aliveOnNextIteration;
 		this.nextIterationSet=false;
 	}
