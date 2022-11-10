@@ -9,11 +9,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Game implements Serializable{
-	private static int iteration=0;
-	private static int population=0;
-	private static int[] bornRule;
-	private static int[] surviveRule;
-	private static Grid gameGrid;
+	private int iteration=0;
+	private int population=0;
+	private int[] bornRule;
+	private int[] surviveRule;
+	private Grid gameGrid;
 	
 	/*private void autorun() {
 		for(int i=0;)
@@ -25,7 +25,7 @@ public class Game implements Serializable{
 	
 	public Game() {
 		this.gameGrid=new Grid(50);
-		System.out.println("Game Init!");
+		//System.out.println("Game Init!");
 	}
 	
 	/**
@@ -33,7 +33,7 @@ public class Game implements Serializable{
 	 */
 	public void nextIteration() {
 		this.population=0;
-		System.out.println("Calculating iteration.");
+		//System.out.println("Calculating iteration.");
 		this.iteration++;
 		for(int i=0;i<50;i++) {
 			for(int j=0;j<50;j++) {

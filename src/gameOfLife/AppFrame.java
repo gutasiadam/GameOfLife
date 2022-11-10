@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class AppFrame extends JFrame{
-	private JPanel mainPanel;
+	protected JPanel mainPanel;
 	private ArrayList<gameOfLifeCellbutton> gameGridButtons;
 	
 	protected static Game gameOfLifeGame;
@@ -20,9 +20,41 @@ public class AppFrame extends JFrame{
 	private JButton resetButton;
 	private JButton saveStateButton;
 	private JButton loadStateButton;
+	
+	private JButton stepButton;
+	private JButton autoButton;
+	
+	private JButton x1Button;
+	private JButton x2Button;
+	private JButton x3Button;
+	private JButton x4Button;
+	
+	int sleepTime=200;
+	
 	//some settings that needs to be stored
 	
 	String simulationstatus;
+	
+	private void autoStep() {
+		while(true) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//mainPanel.removeAll();
+		gameOfLifeGame.nextIteration();
+		gameOfLifeGame.applyIteration();
+		//re-render game fields
+		for(gameOfLifeCellbutton i : gameGridButtons) {
+			if(i.getConnectedCell().isAlive()==true) i.setBackground(Color.YELLOW);
+			else i.setBackground(Color.BLACK);
+		}
+		mainPanel.repaint();
+		mainPanel.revalidate();
+		}
+	}
 	
 	private void lockInputs() {
 		this.addRuleButton.setEnabled(false);
@@ -89,11 +121,14 @@ public class AppFrame extends JFrame{
         		but.setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
         	}
         }
-        JButton auto = new JButton("Auto");
-        auto.setPreferredSize(new Dimension(100,50));
-        JButton step = new JButton("Step");
-        step.addActionListener(new stepButtonListener());
-        step.setPreferredSize(new Dimension(100,50));
+        autoButton = new JButton("Auto");
+        autoButton.setPreferredSize(new Dimension(100,50));
+        autoButton.setEnabled(false);
+        autoButton.addActionListener(new autoButtonListener());
+        stepButton = new JButton("Step");
+        stepButton.addActionListener(new stepButtonListener());
+        stepButton.setEnabled(false);
+        stepButton.setPreferredSize(new Dimension(100,50));
         
         
         /**
@@ -157,7 +192,7 @@ public class AppFrame extends JFrame{
 		bottomPanel.add(resetButton);
 		resetButton.addActionListener(new resetButtonListener());
         
-        gamePanel.add(auto); gamePanel.add(step);
+        gamePanel.add(autoButton); gamePanel.add(stepButton);
        
         
 		this.add(mainPanel);
@@ -196,23 +231,77 @@ public class AppFrame extends JFrame{
 				String[] splittedRuleInput=ruleText.split("\\/");
 				
 				//Debug
-				System.out.println("Splitted rule input 'B' is "+ splittedRuleInput[0]);
-				System.out.println("Splitted rule input 'S' is "+ splittedRuleInput[1]);
+				//System.out.println("Splitted rule input 'B' is "+ splittedRuleInput[0]);
+				//System.out.println("Splitted rule input 'S' is "+ splittedRuleInput[1]);
 				
 				gameOfLifeGame.setbornRule(chartoIntArray(splittedRuleInput[0].toCharArray()));
 				gameOfLifeGame.setsurviveRule(chartoIntArray(splittedRuleInput[1].toCharArray()));
 				
+				stepButton.setEnabled(true);
+				autoButton.setEnabled(true);
+				
 			}else {
 				statusLabel.setText("Not a valid input");
 				statusLabel.setForeground(Color.RED);
+				stepButton.setEnabled(false);
+				autoButton.setEnabled(false);
 			}
 			
 		}
 	}
     
+    private class x1ButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			sleepTime=200;
+		}
+    	
+    }
+    
+    private class x2ButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			sleepTime=100;
+		}
+    	
+    }
+    
+    private class x3ButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			sleepTime=50;
+		}
+    	
+    }
+    
+    private class x4ButtonListener implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub
+			sleepTime=25;
+		}
+    	
+    }
+    
+    private class autoButtonListener implements ActionListener{
+    	@Override
+    	public void actionPerformed(ActionEvent ae) {
+    		autoButton.setEnabled(false);
+    		autoStep();
+    	}
+    }
+    
     private class stepButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
+    		//mainPanel.removeAll();
     		gameOfLifeGame.nextIteration();
     		gameOfLifeGame.applyIteration();
     		//re-render game fields
@@ -220,6 +309,8 @@ public class AppFrame extends JFrame{
     			if(i.getConnectedCell().isAlive()==true) i.setBackground(Color.YELLOW);
     			else i.setBackground(Color.BLACK);
     		}
+    		mainPanel.repaint();
+    		mainPanel.revalidate();
     	}
     }
     
@@ -227,7 +318,7 @@ public class AppFrame extends JFrame{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
     		gameOfLifeGame.loadGame();
-    		System.out.println("Loading stuff");
+    		System.out.println("Loading state...");
     		
     		for(int i=0;i<50;i++) {
             	for(int j=0;j<50;j++) {
@@ -236,7 +327,6 @@ public class AppFrame extends JFrame{
     		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
     			if(cellButton.getConnectedCell().aliveOnNextIteration) {
     				cellButton.setBackground(Color.YELLOW);
-    				System.out.println("Putty");
     			}
     				
     		}
@@ -250,6 +340,7 @@ public class AppFrame extends JFrame{
     	}
     }
     
+    
     private class resetButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
@@ -260,6 +351,11 @@ public class AppFrame extends JFrame{
     		unlockInputs();
 			statusLabel.setText("No rule set.");
 			statusLabel.setForeground(Color.BLACK);
+
+			stepButton.setEnabled(false);
+			autoButton.setEnabled(false);
+			mainPanel.repaint();
+			mainPanel.revalidate();
     	}
     }
 	
