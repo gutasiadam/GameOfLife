@@ -21,6 +21,9 @@ public class AppFrame extends JFrame{
 	private JButton saveStateButton;
 	private JButton loadStateButton;
 	
+	private JLabel iterationLabel;
+	private JLabel populationLabel;
+	
 	private JButton stepButton;
 	private JButton autoButton;
 	
@@ -34,7 +37,15 @@ public class AppFrame extends JFrame{
 	//some settings that needs to be stored
 	
 	String simulationstatus;
+	private void enableStepping() {
+		this.stepButton.setEnabled(true);
+		this.autoButton.setEnabled(true);
+	}
 	
+	private void disableStepping() {
+		this.stepButton.setEnabled(false);
+		this.autoButton.setEnabled(false);
+	}
 	private void autoStep() {
 		while(true) {
 		try {
@@ -63,9 +74,11 @@ public class AppFrame extends JFrame{
 		}
 		saveStateButton.setEnabled(true);
 		loadStateButton.setEnabled(false);
+		enableStepping();
 	}
 	
 	private void unlockInputs() {
+		disableStepping();
 		this.addRuleButton.setEnabled(true);
 		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
 			cellButton.setEnabled(true);
@@ -193,6 +206,20 @@ public class AppFrame extends JFrame{
 		resetButton.addActionListener(new resetButtonListener());
         
         gamePanel.add(autoButton); gamePanel.add(stepButton);
+        
+        /**
+         * Bottom panel - Population Counter
+         */
+        
+        populationLabel=new JLabel("Population number appear here..");
+        bottomPanel.add(populationLabel);
+        
+        /**
+         * Bottom panel - Iteration Counter
+         */
+        
+        iterationLabel=new JLabel("Iteration number appear here..");
+        bottomPanel.add(iterationLabel);
        
         
 		this.add(mainPanel);
@@ -237,14 +264,12 @@ public class AppFrame extends JFrame{
 				gameOfLifeGame.setbornRule(chartoIntArray(splittedRuleInput[0].toCharArray()));
 				gameOfLifeGame.setsurviveRule(chartoIntArray(splittedRuleInput[1].toCharArray()));
 				
-				stepButton.setEnabled(true);
-				autoButton.setEnabled(true);
+				enableStepping();
 				
 			}else {
 				statusLabel.setText("Not a valid input");
 				statusLabel.setForeground(Color.RED);
-				stepButton.setEnabled(false);
-				autoButton.setEnabled(false);
+				disableStepping();
 			}
 			
 		}
@@ -311,24 +336,35 @@ public class AppFrame extends JFrame{
     		}
     		mainPanel.repaint();
     		mainPanel.revalidate();
+    		
+    		iterationLabel.setText(String.valueOf(gameOfLifeGame.getIteration()));
+    		populationLabel.setText(String.valueOf(gameOfLifeGame.getPopulation()));
     	}
     }
     
     private class loadButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
-    		gameOfLifeGame.loadGame();
-    		System.out.println("Loading state...");
-    		
-    		for(int i=0;i<50;i++) {
-            	for(int j=0;j<50;j++) {
-            		gameGridButtons.get((i+(50*j))).setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
-            	}}
-    		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
-    			if(cellButton.getConnectedCell().aliveOnNextIteration) {
-    				cellButton.setBackground(Color.YELLOW);
-    			}
-    				
+    		if(gameOfLifeGame.loadGame()) {
+    			statusLabel.setText("Saved game loaded.");
+    			lockInputs();
+    			enableStepping();
+        		iterationLabel.setText(String.valueOf(gameOfLifeGame.getIteration()));
+        		populationLabel.setText(String.valueOf(gameOfLifeGame.getPopulation()));
+        		for(int i=0;i<50;i++) {
+                	for(int j=0;j<50;j++) {
+                		gameGridButtons.get((i+(50*j))).setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
+                	}}
+        		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
+        			if(cellButton.getConnectedCell().aliveOnNextIteration) {
+        				cellButton.setBackground(Color.YELLOW);
+        			}
+        				
+        		}
+    		}else {
+    			unlockInputs();
+    			disableStepping();
+    			statusLabel.setText("Failed to load saved game.");
     		}
     	}
     }
@@ -351,9 +387,10 @@ public class AppFrame extends JFrame{
     		unlockInputs();
 			statusLabel.setText("No rule set.");
 			statusLabel.setForeground(Color.BLACK);
-
-			stepButton.setEnabled(false);
-			autoButton.setEnabled(false);
+			iterationLabel.setText("0");
+    		populationLabel.setText("0");
+    		gameOfLifeGame.resetIteration();
+    		disableStepping();
 			mainPanel.repaint();
 			mainPanel.revalidate();
     	}
@@ -373,8 +410,8 @@ class gameOfLifeCellbutton extends JButton{
 		
 	}
 	
-	public gameOfLifeCellbutton(ButtonAction ba) {
-		super(ba);
+	public gameOfLifeCellbutton(ButtonAction bA) {
+		super(bA);
 	}
 }
 class ButtonAction extends AbstractAction {

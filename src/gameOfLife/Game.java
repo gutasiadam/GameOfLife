@@ -1,5 +1,6 @@
 package gameOfLife;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -115,24 +116,40 @@ public class Game implements Serializable{
 		FileOutputStream fout=new FileOutputStream("gameOfLifeGameState.txt");    
 		ObjectOutputStream out=new ObjectOutputStream(fout);    
 		out.writeObject(gameGrid);    
+		out.writeObject(bornRule);
+		out.writeObject(surviveRule);
+		out.writeObject(iteration);
+		out.writeObject(population);
 		out.flush();
 		out.close();
 		}catch(IOException e) {}   
 		
 	}
 	
-	public void loadGame() {
-		System.out.println("Loading");
+	/**
+	 * Előző mentés betöltése
+	 */
+	public boolean loadGame() {
 		try {
-		FileInputStream fin=new FileInputStream("gameOfLifeGameState.txt");    
-		ObjectInputStream in=new ObjectInputStream(fin);    
-		gameGrid=(Grid)in.readObject();
-		in.close();
-		gameGrid.printGrid();
+			File gameData = new File("gameOfLifeGameState.txt");    
+			if (gameData.exists()) {
+			    FileInputStream fileInputStream = new FileInputStream(gameData);
+			    ObjectInputStream in=new ObjectInputStream(fileInputStream);    
+			    gameGrid=(Grid)in.readObject();
+			    bornRule=(int[])in.readObject();;
+			    surviveRule=(int[])in.readObject();;
+			    iteration=(int)in.readObject();;
+			    population=(int)in.readObject();;
+			    in.close();
+			    gameGrid.printGrid();
+			}else {
+				return false;
+			}
 		}catch(IOException e) {} catch (ClassNotFoundException e) {
-			System.out.println("Valami nem jó");
+			//...
 		}   
-		
+		System.out.println("Game: Loading done.");
+		return true;
 	}
 	
 	public Grid getGameGrid() {
@@ -144,5 +161,15 @@ public class Game implements Serializable{
 	}
 	public void decreasePopulation() {
 		this.population--;
+	}
+	
+	public int getPopulation() {
+		return this.population;
+	}
+	public int getIteration() {
+		return this.iteration;
+	}
+	public void resetIteration() {
+		this.iteration=0;
 	}
 }
