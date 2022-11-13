@@ -55,7 +55,6 @@ public class Game implements Serializable{
 						}
 					}
 				}else {
-					this.population++;
 					//Ha a cella él, akkor a S... szabály alapján kell vizsgálnunk a szomszádokat.
 					for(int k=0;k<surviveRule.length;k++) {
 						if(surviveRule[k]==activeNeighborsCount) {
@@ -79,6 +78,7 @@ public class Game implements Serializable{
 			for(int j=0;j<50;j++) {
 				Cell c = gameGrid.getCellByPos(i, j);
 				c.Step();
+				if(c.isAlive()) this.population++;
 			}
 		}
 	}

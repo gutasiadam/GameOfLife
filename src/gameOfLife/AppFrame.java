@@ -94,11 +94,70 @@ public class AppFrame extends JFrame{
 		AppFrame.gameOfLifeGame=game;
 		this.setResizable(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		Dimension windowSize = new Dimension(1280, 720);
+		Dimension windowSize = new Dimension(1280, 1280);
 		this.setPreferredSize(windowSize);
-		this.setResizable(false);
-		this.mainPanel= new JPanel(new GridLayout(0,2)); // GridBagLayout?
+		this.setResizable(true);
+		this.mainPanel= new JPanel(); // GridBagLayout?
+		this.mainPanel.setLayout(new BorderLayout());
+		GridBagConstraints c = new GridBagConstraints();
 		
+		c.fill = GridBagConstraints.HORIZONTAL;
+
+		/**
+		 * Top Panel
+		 * Eleme a státuskijelző, betöltő és mentő gomb.
+		 */
+		
+		JPanel topPanel= new JPanel(new GridLayout(1,6));
+		mainPanel.add(topPanel,BorderLayout.PAGE_START);
+		
+		/**
+		 * Bottom panel - statusLabel
+		 */
+		statusLabel= new JLabel("no status Set");
+		statusLabel.setForeground(Color.BLACK);
+		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		statusLabel.setMinimumSize(new Dimension(300, 40));
+		statusLabel.setPreferredSize(new Dimension(300, 40));
+		statusLabel.setMaximumSize(new Dimension(500, 40));
+		statusLabel.setFont(new Font("big", Font.PLAIN, 30));
+		topPanel.add(statusLabel);
+		
+		/**
+		 * Bottom panel - rule input
+		 */
+		
+		ruleInput = new JTextField(25);
+		addRuleButton=new JButton("OK");  
+		addRuleButton.addActionListener(new addRuleButtonListener());
+		saveStateButton= new JButton("Save state");
+		saveStateButton.addActionListener(new saveButtonListener());
+		saveStateButton.setEnabled(false);
+		
+		loadStateButton= new JButton("Load state");
+		loadStateButton.addActionListener(new loadButtonListener());
+		
+		/**
+		 * Bottom panel - additional spacing
+		 */
+	
+		topPanel.setBorder(new LineBorder(Color.ORANGE, 4, true));
+		topPanel.add(ruleInput, BorderLayout.CENTER);
+		topPanel.add(addRuleButton);
+		
+		topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+		
+		topPanel.add(saveStateButton, BorderLayout.SOUTH);
+		topPanel.add(loadStateButton, BorderLayout.SOUTH);
+		
+		/**
+		 * Bottom panel - Reset button
+		 */
+		
+		resetButton= new JButton("Reset");
+		topPanel.add(resetButton);
+		resetButton.addActionListener(new resetButtonListener());
+        
 		
 		/**
 		 * Game panel
@@ -108,8 +167,11 @@ public class AppFrame extends JFrame{
 		JPanel gameField = new JPanel(new GridLayout(50,50,1,1));
 		mainPanel.add(gamePanel);
 		//leftside.setBackground(Color.black);
-		gamePanel.add(gameField,BorderLayout.CENTER);
-		gameField.setBorder(new LineBorder(Color.BLACK, 4, true));
+		c.gridx = 0;
+		c.gridy = 0;
+		gamePanel.add(gameField);
+		mainPanel.add(gamePanel,BorderLayout.CENTER);
+		gameField.setBorder(new LineBorder(Color.RED, 4, true));
 		
 			
 		mainPanel.setBorder(new LineBorder(Color.BLUE, 4, true));
@@ -119,9 +181,9 @@ public class AppFrame extends JFrame{
         gameGridButtons=new ArrayList<gameOfLifeCellbutton>();
         for(int i=0;i<50;i++) {
         	for(int j=0;j<50;j++) {
-        		Cell c = new Cell();
+        		Cell ce = new Cell();
         		gameOfLifeCellbutton but= new gameOfLifeCellbutton(new ButtonAction(i+"+"+j));
-        		gameOfLifeGame.getGameGrid().setCellByPos(i, j, c);
+        		gameOfLifeGame.getGameGrid().setCellByPos(i, j, ce);
         		but.setBorderPainted(false);
         		but.setText(null);
         		but.setName(i+" "+j);
@@ -130,7 +192,7 @@ public class AppFrame extends JFrame{
         		but.setOpaque(true);
         		gameGridButtons.add(but);
         		gameField.add(but);
-        		gameOfLifeGame.getGameGrid().setCellByPos(i, j, c);
+        		gameOfLifeGame.getGameGrid().setCellByPos(i, j, ce);
         		but.setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
         	}
         }
@@ -148,78 +210,39 @@ public class AppFrame extends JFrame{
 		 * Bottom panel
 		 */
 		
-		JPanel bottomPanel= new JPanel();
+		JPanel bottomPanel= new JPanel(new GridLayout(1,8));
 		bottomPanel.setPreferredSize(new Dimension(1,100));
+		//mainPanel.add(bottomPanel,BorderLayout.PAGE_END);
+		c.gridx = 1;
+		c.gridy = 0;
 		mainPanel.add(bottomPanel,BorderLayout.PAGE_END);
 		bottomPanel.setBorder(new LineBorder(Color.ORANGE, 4, true));
 		
+
 		/**
-		 * Bottom panel - statusLabel
-		 */
-		statusLabel= new JLabel("no status Set");
-		statusLabel.setForeground(Color.BLACK);
-		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		statusLabel.setMinimumSize(new Dimension(300, 40));
-		statusLabel.setPreferredSize(new Dimension(300, 40));
-		statusLabel.setMaximumSize(new Dimension(500, 40));
-		statusLabel.setFont(new Font("big", Font.PLAIN, 30));
-		bottomPanel.add(statusLabel);
-		
-		/**
-		 * Bottom panel - rule input
+		 * xN buttons
 		 */
 		
-		JLabel label = new JLabel("Rule ");
-		JLabel labelDesc = new JLabel("Format: BXX/SXX");
-		labelDesc.setForeground(Color.GRAY);
-		ruleInput = new JTextField(20);
-		addRuleButton=new JButton("OK");  
-		addRuleButton.addActionListener(new addRuleButtonListener());
-		saveStateButton= new JButton("Save state");
-		saveStateButton.addActionListener(new saveButtonListener());
-		saveStateButton.setEnabled(false);
-		
-		loadStateButton= new JButton("Load state");
-		loadStateButton.addActionListener(new loadButtonListener());
-		
-		/**
-		 * Bottom panel - additional spacing
-		 */
-	
-		bottomPanel.add(label, BorderLayout.NORTH);
-		bottomPanel.add(labelDesc);
-		bottomPanel.setBorder(new LineBorder(Color.ORANGE, 4, true));
-		bottomPanel.add(ruleInput, BorderLayout.CENTER);
-		bottomPanel.add(addRuleButton);
-		
-		bottomPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
-		
-		bottomPanel.add(saveStateButton, BorderLayout.SOUTH);
-		bottomPanel.add(loadStateButton, BorderLayout.SOUTH);
-		
-		/**
-		 * Bottom panel - Reset button
-		 */
-		
-		resetButton= new JButton("Reset");
-		bottomPanel.add(resetButton);
-		resetButton.addActionListener(new resetButtonListener());
-        
-        gamePanel.add(autoButton); gamePanel.add(stepButton);
-        
+		this.x1Button=new JButton("x1");
+		this.x2Button=new JButton("x2");
+		this.x3Button=new JButton("x3");
+		this.x4Button=new JButton("x4");
         /**
          * Bottom panel - Population Counter
          */
         
-        populationLabel=new JLabel("Population number appear here..");
+        populationLabel=new JLabel("Population: <>");
         bottomPanel.add(populationLabel);
         
         /**
          * Bottom panel - Iteration Counter
          */
         
-        iterationLabel=new JLabel("Iteration number appear here..");
+        iterationLabel=new JLabel("Iteration: <>");
         bottomPanel.add(iterationLabel);
+        bottomPanel.add(autoButton);
+        bottomPanel.add(x1Button); bottomPanel.add(x2Button); bottomPanel.add(x3Button); bottomPanel.add(x4Button);
+        bottomPanel.add(stepButton);
        
         
 		this.add(mainPanel);
@@ -337,8 +360,8 @@ public class AppFrame extends JFrame{
     		mainPanel.repaint();
     		mainPanel.revalidate();
     		
-    		iterationLabel.setText(String.valueOf(gameOfLifeGame.getIteration()));
-    		populationLabel.setText(String.valueOf(gameOfLifeGame.getPopulation()));
+    		iterationLabel.setText("<html>Iteration: <strong>"+String.valueOf(gameOfLifeGame.getIteration()+"</strong><html>"));
+    		populationLabel.setText("<html>Population: <strong>"+String.valueOf(gameOfLifeGame.getPopulation()+"</strong><html>"));
     	}
     }
     
@@ -349,8 +372,8 @@ public class AppFrame extends JFrame{
     			statusLabel.setText("Saved game loaded.");
     			lockInputs();
     			enableStepping();
-        		iterationLabel.setText(String.valueOf(gameOfLifeGame.getIteration()));
-        		populationLabel.setText(String.valueOf(gameOfLifeGame.getPopulation()));
+        		iterationLabel.setText("<html>Iteration: <strong>"+String.valueOf(gameOfLifeGame.getIteration()+"</strong><html>"));
+        		populationLabel.setText("<html>Population: <strong>"+String.valueOf(gameOfLifeGame.getPopulation()+"</strong><html>"));
         		for(int i=0;i<50;i++) {
                 	for(int j=0;j<50;j++) {
                 		gameGridButtons.get((i+(50*j))).setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
