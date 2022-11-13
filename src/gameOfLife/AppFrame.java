@@ -34,7 +34,6 @@ public class AppFrame extends JFrame{
 	
 	int sleepTime=200;
 	
-	//some settings that needs to be stored
 	
 	String simulationstatus;
 	private void enableStepping() {
@@ -51,22 +50,24 @@ public class AppFrame extends JFrame{
 		try {
 			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//mainPanel.removeAll();
 		gameOfLifeGame.nextIteration();
 		gameOfLifeGame.applyIteration();
-		//re-render game fields
+		
 		for(gameOfLifeCellbutton i : gameGridButtons) {
 			if(i.getConnectedCell().isAlive()==true) i.setBackground(Color.YELLOW);
 			else i.setBackground(Color.BLACK);
 		}
+		//re-render game fields
 		mainPanel.repaint();
 		mainPanel.revalidate();
 		}
 	}
 	
+	/**
+	 * Megtiltja, hogy a felhasználó mentett jáékmenetet töltsön be, vagy állítja a cellák állapotát.
+	 */
 	private void lockInputs() {
 		this.addRuleButton.setEnabled(false);
 		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
@@ -77,6 +78,9 @@ public class AppFrame extends JFrame{
 		enableStepping();
 	}
 	
+	/**
+	 * Engedélyezi, hogy a felhasználó mentett jáékmenetet töltsön be, vagy állítja a cellák állapotát.
+	 */
 	private void unlockInputs() {
 		disableStepping();
 		this.addRuleButton.setEnabled(true);
@@ -89,6 +93,11 @@ public class AppFrame extends JFrame{
 		loadStateButton.setEnabled(true);
 		
 	}
+	
+	/**
+	 * A Swing Frame, amiben a játék UI látszik.
+	 * @param game
+	 */
 	public AppFrame(Game game) {
 		super("Game Of Life");
 		AppFrame.gameOfLifeGame=game;
@@ -99,9 +108,6 @@ public class AppFrame extends JFrame{
 		this.setResizable(true);
 		this.mainPanel= new JPanel(); // GridBagLayout?
 		this.mainPanel.setLayout(new BorderLayout());
-		GridBagConstraints c = new GridBagConstraints();
-		
-		c.fill = GridBagConstraints.HORIZONTAL;
 
 		/**
 		 * Top Panel
@@ -112,7 +118,7 @@ public class AppFrame extends JFrame{
 		mainPanel.add(topPanel,BorderLayout.PAGE_START);
 		
 		/**
-		 * Bottom panel - statusLabel
+		 * Top panel - statusLabel
 		 */
 		statusLabel= new JLabel("no status Set");
 		statusLabel.setForeground(Color.BLACK);
@@ -124,7 +130,7 @@ public class AppFrame extends JFrame{
 		topPanel.add(statusLabel);
 		
 		/**
-		 * Bottom panel - rule input
+		 * Top panel - rule input
 		 */
 		
 		ruleInput = new JTextField(25);
@@ -138,7 +144,7 @@ public class AppFrame extends JFrame{
 		loadStateButton.addActionListener(new loadButtonListener());
 		
 		/**
-		 * Bottom panel - additional spacing
+		 * Top panel - additional spacing
 		 */
 	
 		topPanel.setBorder(new LineBorder(Color.ORANGE, 4, true));
@@ -151,7 +157,7 @@ public class AppFrame extends JFrame{
 		topPanel.add(loadStateButton, BorderLayout.SOUTH);
 		
 		/**
-		 * Bottom panel - Reset button
+		 * Top panel - Reset button
 		 */
 		
 		resetButton= new JButton("Reset");
@@ -161,14 +167,11 @@ public class AppFrame extends JFrame{
 		
 		/**
 		 * Game panel
-		 * Eleme egy játékmező, és a játékhoz tartozó gombok.
+		 * Eleme egy játékmező.
 		 */
 		JPanel gamePanel= new JPanel();
 		JPanel gameField = new JPanel(new GridLayout(50,50,1,1));
 		mainPanel.add(gamePanel);
-		//leftside.setBackground(Color.black);
-		c.gridx = 0;
-		c.gridy = 0;
 		gamePanel.add(gameField);
 		mainPanel.add(gamePanel,BorderLayout.CENTER);
 		gameField.setBorder(new LineBorder(Color.RED, 4, true));
@@ -178,6 +181,7 @@ public class AppFrame extends JFrame{
 		
         this.setSize(windowSize);
         
+        //A játékmezőt felépítő JButton elemek.
         gameGridButtons=new ArrayList<gameOfLifeCellbutton>();
         for(int i=0;i<50;i++) {
         	for(int j=0;j<50;j++) {
@@ -207,35 +211,33 @@ public class AppFrame extends JFrame{
         
         
         /**
-		 * Bottom panel
+		 * Bottom panel - eleme a statisztika kijelzők, és a léptetéshez szükséges gombok.
 		 */
 		
 		JPanel bottomPanel= new JPanel(new GridLayout(1,8));
 		bottomPanel.setPreferredSize(new Dimension(1,100));
-		//mainPanel.add(bottomPanel,BorderLayout.PAGE_END);
-		c.gridx = 1;
-		c.gridy = 0;
 		mainPanel.add(bottomPanel,BorderLayout.PAGE_END);
 		bottomPanel.setBorder(new LineBorder(Color.ORANGE, 4, true));
 		
 
 		/**
-		 * xN buttons
+		 * xN buttons - segítésgükkel állítható az Auto szimuláció sebessége
 		 */
 		
 		this.x1Button=new JButton("x1");
 		this.x2Button=new JButton("x2");
 		this.x3Button=new JButton("x3");
 		this.x4Button=new JButton("x4");
+		
         /**
-         * Bottom panel - Population Counter
+         * Bottom panel - Népességszámláló
          */
         
         populationLabel=new JLabel("Population: <>");
         bottomPanel.add(populationLabel);
         
         /**
-         * Bottom panel - Iteration Counter
+         * Bottom panel - Iteráció számláló
          */
         
         iterationLabel=new JLabel("Iteration: <>");
@@ -249,6 +251,11 @@ public class AppFrame extends JFrame{
 		this.pack();
 		this.setLocationRelativeTo(null);
 	}
+	/**
+	 * Az új szabály beviteléhez tartozó gomb Listenerje.
+	 * @author gutasiadam
+	 *
+	 */
     private class addRuleButtonListener implements ActionListener
 	{	
     	/**
@@ -266,6 +273,7 @@ public class AppFrame extends JFrame{
     		}
     		return res;
     	}
+    	
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			String ruleText=ruleInput.getText();
@@ -276,7 +284,7 @@ public class AppFrame extends JFrame{
 				statusLabel.setForeground(Color.green);
 				statusLabel.setText(ruleInput.getText());
 				
-				//B-S szétválasztása
+				//B/S szétválasztása
 				ruleText=ruleText.replaceAll("[A-Z]", "");
 				String[] splittedRuleInput=ruleText.split("\\/");
 				

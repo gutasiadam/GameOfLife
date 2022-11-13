@@ -12,10 +12,6 @@ public class Grid implements Serializable {
 		this.gameGrid = grid;
 	}
 	
-	/*public Cell[][] getGameGrid(){
-		return gameGrid;
-	}*/
-	
 	public Grid(int s) {
 		gameGrid= new Cell[s][s];
 	}
@@ -23,6 +19,13 @@ public class Grid implements Serializable {
 		return this.gameGrid;
 	}
 	
+	/**
+	 * Cella lekérése pozíció alapján.
+	 * @param row - A cella sorának száma.
+	 * @param col - A cella oszlopának száma.
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 */
 	public Cell getCellByPos(int row, int col) throws IndexOutOfBoundsException{
 		try {
 			return gameGrid[row][col];
@@ -33,6 +36,14 @@ public class Grid implements Serializable {
 		
 	}
 	
+	
+	/**
+	 * Cella beállítása egy adott pozícióra.
+	 * @param row
+	 * @param col
+	 * @param c
+	 * @throws IndexOutOfBoundsException
+	 */
 	public void setCellByPos(int row, int col, Cell c) throws IndexOutOfBoundsException{
 		try {
 			gameGrid[row][col]=c;
@@ -41,6 +52,9 @@ public class Grid implements Serializable {
 		}
 	}
 	
+	/**
+	 * Játékmező kirajzolása a szabványos kimenetre.
+	 */
 	public void printGrid() {
 		System.out.println("Printing grid");
 		for(int i=0;i<49;i++) {
@@ -56,8 +70,13 @@ public class Grid implements Serializable {
 		}
 	}
 	
+	/**
+	 * Cella szomszédainak lekérdezése
+	 * @param row - A cella sorának száma.
+	 * @param col - A cella oszlopának száma.
+	 * @return
+	 */
 	public HashMap<String,Cell> getCellNeighbors(int row, int col) {
-		//HashMap<String,Cell> cellNeighBors = new HashMap<>();
 		HashMap<String,Cell> cellNeighbors = new HashMap<>(); // U1, U2, U3, R, L, B1, B2, B3
 		
 		cellNeighbors.put("U1", getCellByPos(row-1,col-1));
@@ -79,6 +98,12 @@ public class Grid implements Serializable {
 		return cellNeighbors;
 	}
 	
+	/**
+	 * Cella aktív szomszédainak számának lekérdezése
+	 * @param row - A cella sorának száma.
+	 * @param col - A cella oszlopának száma.
+	 * @return
+	 */
 	public int activeCellNeighbors(int row, int col) {
 		int res=0;
 		
@@ -94,15 +119,5 @@ public class Grid implements Serializable {
 			}
 		}
 		return res;
-	}
-	
-	public void printCellNeighBors(int row, int col) {
-		HashMap<String,Cell> neighbors = getCellNeighbors(row,col);
-		ArrayList<Cell> neighborCells= new ArrayList<>(neighbors.values());
-		ArrayList<String> locations = new ArrayList(neighbors.keySet());
-
-		for(int i=0;i<neighborCells.size();i++) {
-			System.out.println(locations.get(i)+" - "+neighbors.get(locations.get(i)));
-		}
 	}
 }

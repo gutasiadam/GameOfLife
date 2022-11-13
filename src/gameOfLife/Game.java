@@ -84,9 +84,13 @@ public class Game implements Serializable{
 	}
 	
 	public boolean validateRule(String input) {
-		return(input.matches("B{1}[1-9]+\\/S{1}[1-9]+"));
+		return(input.matches("B{1}[0-9]+\\/S{1}[0-9]+"));
 	}
 	
+	/**
+	 * Születési szabály-tömb beállítása
+	 * @param b
+	 */
 	public void setbornRule(int[] b) {
 		bornRule=new int[b.length];
 		for(int i=0;i<b.length;i++) {
@@ -94,6 +98,10 @@ public class Game implements Serializable{
 		}
 	}
 	
+	/**
+	 * Túlélési szabály-tömb beállítása
+	 * @param b
+	 */
 	public void setsurviveRule(int[] s) {
 		surviveRule=new int[s.length];
 		for(int i=0;i<s.length;i++) {
@@ -101,14 +109,26 @@ public class Game implements Serializable{
 		}
 	}
 	
+	/**
+	 * Születési szabály-tömb lekérdezése
+	 * @param b
+	 */
 	public int[] getbornRule() {
 		return this.bornRule;
 	}
 	
+	/**
+	 * Túlélési szabály-tömb lekérdezése
+	 * @param b
+	 */
 	public int[] getsurviveRule() {
 		return this.surviveRule;
 	}
 	
+	/**
+	 * Játékállás kimentése
+	 * @param b
+	 */
 	public void saveGame() {
 		System.out.println("Saving");
 		gameGrid.printGrid();
@@ -152,23 +172,41 @@ public class Game implements Serializable{
 		return true;
 	}
 	
+	/**
+	 * Játékmező lekérése.
+	 * @param b
+	 */
 	public Grid getGameGrid() {
 		return this.gameGrid;
 	}
 	
+	/**
+	 * Populáció értékének növelése.
+	 * @param b
+	 */
 	public void increasePopulation() {
 		this.population++;
 	}
-	public void decreasePopulation() {
-		this.population--;
-	}
 	
+	/**
+	 * Populáció számának lekérése.
+	 * @param b
+	 */
 	public int getPopulation() {
 		return this.population;
 	}
+	
+	/**
+	 * Iteráció számának lekérése.
+	 * @param b
+	 */
 	public int getIteration() {
 		return this.iteration;
 	}
+	
+	/**
+	 * Iteráció visszaállítása.
+	 */
 	public void resetIteration() {
 		this.iteration=0;
 	}
