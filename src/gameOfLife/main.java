@@ -9,9 +9,9 @@ public class main {
 		//Játék létrehozása
 		Game gameOfLife= new Game();
 		//Kerek létrehozása
-		AppFrame frame = new AppFrame(gameOfLife);
 		//Megjelenítés
-		frame.setVisible(true);
+		Thread t=new Thread(new AppFrame(gameOfLife));
+		t.start();
 		//Szomszédság-teszt:
 		//gameOfLife.getGameGrid().printCellNeighBors(30, 20);
 	}

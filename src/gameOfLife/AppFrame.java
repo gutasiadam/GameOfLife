@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class AppFrame extends JFrame{
+public class AppFrame extends JFrame implements Runnable{
 	protected JPanel mainPanel;
 	private ArrayList<gameOfLifeCellbutton> gameGridButtons;
 	
@@ -32,26 +32,28 @@ public class AppFrame extends JFrame{
 	private JButton x3Button;
 	private JButton x4Button;
 	
-	int sleepTime=200;
-	
+	private int sleepTime;
+	private boolean autoSimulationAllowed;
 	
 	String simulationstatus;
+	public boolean getautoEnabled(){return autoButton.isEnabled();}
+	public void setautoEnabled(boolean b) {autoButton.setEnabled(b);}
+	
+	public boolean getautoSimulationAllowed(){return autoSimulationAllowed;}
+	public void setautoSimulationAllowed(boolean b) {autoSimulationAllowed=b;}
+	
+	public int getSleepTime() {return this.sleepTime;}
+	public void setSleepTime(int to) {this.sleepTime=to;}
+	
+	
 	private void enableStepping() {
 		this.stepButton.setEnabled(true);
-		this.autoButton.setEnabled(true);
 	}
 	
 	private void disableStepping() {
 		this.stepButton.setEnabled(false);
-		this.autoButton.setEnabled(false);
 	}
-	private void autoStep() {
-		while(true) {
-		try {
-			Thread.sleep(sleepTime);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	private void Step() {
 		gameOfLifeGame.nextIteration();
 		gameOfLifeGame.applyIteration();
 		
@@ -62,7 +64,8 @@ public class AppFrame extends JFrame{
 		//re-render game fields
 		mainPanel.repaint();
 		mainPanel.revalidate();
-		}
+		iterationLabel.setText("<html>Iteration: <strong>"+String.valueOf(gameOfLifeGame.getIteration()+"</strong><html>"));
+		populationLabel.setText("<html>Population: <strong>"+String.valueOf(gameOfLifeGame.getPopulation()+"</strong><html>"));
 	}
 	
 	/**
@@ -75,7 +78,6 @@ public class AppFrame extends JFrame{
 		}
 		saveStateButton.setEnabled(true);
 		loadStateButton.setEnabled(false);
-		enableStepping();
 	}
 	
 	/**
@@ -94,12 +96,17 @@ public class AppFrame extends JFrame{
 		
 	}
 	
+	
+	public void executeAutoSimulation(){
+		
+	}
 	/**
 	 * A Swing Frame, amiben a játék UI látszik.
 	 * @param game
 	 */
 	public AppFrame(Game game) {
 		super("Game Of Life");
+		this.sleepTime=1000;
 		AppFrame.gameOfLifeGame=game;
 		this.setResizable(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -224,10 +231,10 @@ public class AppFrame extends JFrame{
 		 * xN buttons - segítésgükkel állítható az Auto szimuláció sebessége
 		 */
 		
-		this.x1Button=new JButton("x1");
-		this.x2Button=new JButton("x2");
-		this.x3Button=new JButton("x3");
-		this.x4Button=new JButton("x4");
+		this.x1Button=new JButton("x1"); this.x1Button.addActionListener(new x1ButtonListener());
+		this.x2Button=new JButton("x2"); this.x2Button.addActionListener(new x2ButtonListener());
+		this.x3Button=new JButton("x3"); this.x3Button.addActionListener(new x3ButtonListener());
+		this.x4Button=new JButton("x4"); this.x4Button.addActionListener(new x4ButtonListener());
 		
         /**
          * Bottom panel - Népességszámláló
@@ -277,9 +284,9 @@ public class AppFrame extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent ae) {
 			String ruleText=ruleInput.getText();
-			System.out.println(ruleInput.getText().isBlank());
-			if(gameOfLifeGame.validateRule(ruleText) && !(ruleInput.getText().isBlank())) {
-				System.out.println("Valid rule entered");
+			//System.out.println(ruleInput.getText().isBlank());
+			if(gameOfLifeGame.validateRule(ruleText.toUpperCase()) && !(ruleInput.getText().isBlank())) {
+				//System.out.println("Valid rule entered");
 				lockInputs();
 				statusLabel.setForeground(Color.green);
 				statusLabel.setText(ruleInput.getText());
@@ -294,8 +301,8 @@ public class AppFrame extends JFrame{
 				
 				gameOfLifeGame.setbornRule(chartoIntArray(splittedRuleInput[0].toCharArray()));
 				gameOfLifeGame.setsurviveRule(chartoIntArray(splittedRuleInput[1].toCharArray()));
-				
 				enableStepping();
+				setautoEnabled(true);
 				
 			}else {
 				statusLabel.setText("Not a valid input");
@@ -310,8 +317,7 @@ public class AppFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			sleepTime=200;
+			setSleepTime(400);
 		}
     	
     }
@@ -320,8 +326,7 @@ public class AppFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			sleepTime=100;
+			setSleepTime(200);
 		}
     	
     }
@@ -330,8 +335,7 @@ public class AppFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			sleepTime=50;
+			setSleepTime(100);
 		}
     	
     }
@@ -340,36 +344,33 @@ public class AppFrame extends JFrame{
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			sleepTime=25;
-		}
-    	
+			setSleepTime(50);}
     }
     
     private class autoButtonListener implements ActionListener{
+    	public static SimulationWorker s;
     	@Override
     	public void actionPerformed(ActionEvent ae) {
-    		autoButton.setEnabled(false);
-    		autoStep();
+    		if(autoButton.getText()=="Auto") {
+    			s=new SimulationWorker();
+    			setautoSimulationAllowed(true);
+    			s.execute();
+    			autoButton.setText("Pause");
+    			disableStepping();
+    			
+    		}else {
+    			autoButton.setText("Auto");
+    			setautoSimulationAllowed(false);
+    			s.done();
+    			enableStepping();
+    		}
     	}
     }
     
     private class stepButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
-    		//mainPanel.removeAll();
-    		gameOfLifeGame.nextIteration();
-    		gameOfLifeGame.applyIteration();
-    		//re-render game fields
-    		for(gameOfLifeCellbutton i : gameGridButtons) {
-    			if(i.getConnectedCell().isAlive()==true) i.setBackground(Color.YELLOW);
-    			else i.setBackground(Color.BLACK);
-    		}
-    		mainPanel.repaint();
-    		mainPanel.revalidate();
-    		
-    		iterationLabel.setText("<html>Iteration: <strong>"+String.valueOf(gameOfLifeGame.getIteration()+"</strong><html>"));
-    		populationLabel.setText("<html>Population: <strong>"+String.valueOf(gameOfLifeGame.getPopulation()+"</strong><html>"));
+    		Step();
     	}
     }
     
@@ -421,11 +422,53 @@ public class AppFrame extends JFrame{
 			iterationLabel.setText("0");
     		populationLabel.setText("0");
     		gameOfLifeGame.resetIteration();
+    		
     		disableStepping();
+    		setautoSimulationAllowed(false);
+    		autoButton.setText("Auto");
+    		
 			mainPanel.repaint();
 			mainPanel.revalidate();
+			
     	}
     }
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		this.setVisible(true);
+		this.setautoEnabled(true);
+	}
+	
+	/**
+	 * 
+	 * @author gutasiadam
+	 * @url https://www.oreilly.com/library/view/learning-java-4th/9781449372477/ch16s05.html
+	 */
+	class SimulationWorker extends SwingWorker<String, Object> {
+	    @Override
+	    public String doInBackground() {
+
+	        // Simulation for sleepTime, without blocking UI
+	        try {
+	        	while(getautoSimulationAllowed()==true) {
+		            Thread.currentThread();
+					Thread.sleep(sleepTime);
+					Step();
+	        	}
+	        } catch (InterruptedException ignore) {}   
+	        return "ended";
+	    }
+
+	    @Override
+	    protected void done() {
+	        try {
+	            Thread.currentThread().interrupt();
+	            //System.out.println("Bye");
+	        } catch (Exception ignore) {}
+	    }
+	}
 	
 }
 class gameOfLifeCellbutton extends JButton{
@@ -463,12 +506,12 @@ class ButtonAction extends AbstractAction {
         c = c == OFF ? ON : OFF;
         if(c==OFF) {
         	btn.getConnectedCell().setState(false);
-        	System.out.println("Selected cell is "+btn.getConnectedCell().getAliveOnNextIteration()+" on next iteration");
         }else {
         	btn.getConnectedCell().setState(true);
-        	System.out.println("Selected cell is "+btn.getConnectedCell().getAliveOnNextIteration()+" on next iteration");
         }
         btn.setBackground(c);
     }
     
 }
+
+
