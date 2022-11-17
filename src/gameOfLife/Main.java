@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
 
-public class main {
+public class Main {
 	public static void main(String[] args) {
 		//Játék létrehozása
 		Game gameOfLife= new Game();

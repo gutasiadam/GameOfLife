@@ -6,17 +6,20 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Grid implements Serializable {
-	private Cell[][] gameGrid;
+	private ArrayList<ArrayList<Cell>> Cells;
 	
-	private Grid(Cell[][] grid) {
-		this.gameGrid = grid;
-	}
 	
 	public Grid(int s) {
-		gameGrid= new Cell[s][s];
+		Cells = new ArrayList<ArrayList<Cell>>();
+		for(int i=0;i<s;i++) {
+			Cells.add(new ArrayList<Cell>());
+			for(int j=0;j<s;j++) {
+				Cells.get(i).add(new Cell());
+			}
+		}
 	}
-	public Cell[][] getGrid(){
-		return this.gameGrid;
+	public ArrayList<ArrayList<Cell>> getGrid(){
+		return Cells;
 	}
 	
 	/**
@@ -28,7 +31,7 @@ public class Grid implements Serializable {
 	 */
 	public Cell getCellByPos(int row, int col) throws IndexOutOfBoundsException{
 		try {
-			return gameGrid[row][col];
+			return Cells.get(row).get(col);
 		}catch(IndexOutOfBoundsException e) {
 			//Az adott pozición nem létezik cella, null értékkel tér vissza.
 			return null;
@@ -46,7 +49,7 @@ public class Grid implements Serializable {
 	 */
 	public void setCellByPos(int row, int col, Cell c) throws IndexOutOfBoundsException{
 		try {
-			gameGrid[row][col]=c;
+			Cells.get(row).set(col, c);
 		}catch(IndexOutOfBoundsException e) {
 			return;
 		}
@@ -59,7 +62,7 @@ public class Grid implements Serializable {
 		System.out.println("Printing grid");
 		for(int i=0;i<49;i++) {
 			for(int j=0;j<49;j++) {
-				if(gameGrid[i][j].isAlive()) {
+				if(Cells.get(i).get(j).isAlive()) {
 					System.out.print("X");
 				}else {
 					System.out.print(" ");
@@ -108,8 +111,8 @@ public class Grid implements Serializable {
 		int res=0;
 		
 		HashMap<String,Cell> neighbors = getCellNeighbors(row,col);
-		ArrayList<Cell> neighborCells= new ArrayList<>(neighbors.values());
-		ArrayList<String> locations = new ArrayList(neighbors.keySet());
+		ArrayList<Cell> neighborCells= new ArrayList<Cell>(neighbors.values());
+		ArrayList<String> locations = new ArrayList<String>(neighbors.keySet());
 
 		for(int i=0;i<neighborCells.size();i++) {
 			if(neighbors.get(locations.get(i))!=null) {

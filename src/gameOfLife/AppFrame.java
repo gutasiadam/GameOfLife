@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class AppFrame extends JFrame implements Runnable{
+	private static final long serialVersionUID = 1L;
 	protected JPanel mainPanel;
 	private ArrayList<gameOfLifeCellbutton> gameGridButtons;
 	
@@ -36,6 +37,46 @@ public class AppFrame extends JFrame implements Runnable{
 	private boolean autoSimulationAllowed;
 	
 	String simulationstatus;
+	/*
+	 * Methódusok a JUnit számára
+	 */
+	
+	/**
+	 * Step gomb lekérése
+	 * @return
+	 */
+	public JButton getstepButton() {return this.stepButton;}
+	
+	/**
+	 * OK gomb lekérése
+	 * @return
+	 */
+	public JButton getaddRuleButton() {return this.addRuleButton;}
+	
+	/**
+	 * Szabály bemeneti mező lekérése
+	 * @return
+	 */
+	public JTextField getruleInput() {return this.ruleInput;}
+	
+	/**
+	 * Load gomb lekérése
+	 * @return
+	 */
+	public JButton getSaveButton() {return this.saveStateButton;}
+	
+	/**
+	 * Save gomb lekérése
+	 * @return
+	 */
+	public JButton getLoadButton() {return this.loadStateButton;}
+	
+	/**
+	 * Reset gomb lekérése
+	 * @return
+	 */
+	public JButton getResetButton() {return this.resetButton;}
+
 	public boolean getautoEnabled(){return autoButton.isEnabled();}
 	public void setautoEnabled(boolean b) {autoButton.setEnabled(b);}
 	
@@ -209,7 +250,7 @@ public class AppFrame extends JFrame implements Runnable{
         }
         autoButton = new JButton("Auto");
         autoButton.setPreferredSize(new Dimension(100,50));
-        autoButton.setEnabled(false);
+        setautoEnabled(false);
         autoButton.addActionListener(new autoButtonListener());
         stepButton = new JButton("Step");
         stepButton.addActionListener(new stepButtonListener());
@@ -228,7 +269,7 @@ public class AppFrame extends JFrame implements Runnable{
 		
 
 		/**
-		 * xN buttons - segítésgükkel állítható az Auto szimuláció sebessége
+		 * xN buttons - Segítésgükkel állítható az Auto szimuláció sebessége
 		 */
 		
 		this.x1Button=new JButton("x1"); this.x1Button.addActionListener(new x1ButtonListener());
@@ -412,6 +453,9 @@ public class AppFrame extends JFrame implements Runnable{
     private class resetButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
+    		disableStepping();
+    		setautoSimulationAllowed(false);
+    		autoButton.setText("Auto");
     		for(gameOfLifeCellbutton i : gameGridButtons) {
     			i.getConnectedCell().setNextiteration(false);
     			i.getConnectedCell().setState(false);
@@ -423,9 +467,7 @@ public class AppFrame extends JFrame implements Runnable{
     		populationLabel.setText("0");
     		gameOfLifeGame.resetIteration();
     		
-    		disableStepping();
-    		setautoSimulationAllowed(false);
-    		autoButton.setText("Auto");
+
     		
 			mainPanel.repaint();
 			mainPanel.revalidate();
@@ -436,9 +478,7 @@ public class AppFrame extends JFrame implements Runnable{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		this.setVisible(true);
-		this.setautoEnabled(true);
 	}
 	
 	/**
@@ -472,6 +512,7 @@ public class AppFrame extends JFrame implements Runnable{
 	
 }
 class gameOfLifeCellbutton extends JButton{
+	private static final long serialVersionUID = 1L;
 	private Cell connectedCell;
 	public void setConnectedCell(Cell c) {
 		this.connectedCell=c;
@@ -489,7 +530,8 @@ class gameOfLifeCellbutton extends JButton{
 	}
 }
 class ButtonAction extends AbstractAction {
-    private static final Color OFF = Color.BLACK;
+    private static final long serialVersionUID = 1L;
+	private static final Color OFF = Color.BLACK;
     private static final Color ON = Color.YELLOW;
 
     public ButtonAction(String name) {

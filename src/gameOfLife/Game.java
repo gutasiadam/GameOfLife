@@ -20,7 +20,7 @@ public class Game implements Serializable{
 		for(int i=0;)
 	}*/
 
-	private Game(Grid grid) {
+	public Game(Grid grid) {
 		this.gameGrid = grid;
 	}
 	
