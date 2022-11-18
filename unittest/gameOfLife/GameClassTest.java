@@ -57,12 +57,11 @@ public class GameClassTest {
 	public void gameIterationTest_PopulationChange() {
 		game.nextIteration();
 		game.applyIteration();
-		int pop=game.getPopulation();
+		int pop=game.getPopulation()+1;
 		game.nextIteration();
 		game.applyIteration();
+		game.increasePopulation(); // +1 populáció
 		int pop2=game.getPopulation();
 		Assert.assertEquals(pop, pop2);
 	}
-	
-	
 }

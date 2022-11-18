@@ -1,3 +1,7 @@
+/**
+ * A játék UI elemei, annak listenerjei.
+ * @author gutasiadam
+ */
 package gameOfLife;
 
 import javax.swing.*;
@@ -11,35 +15,30 @@ import java.util.ArrayList;
 public class AppFrame extends JFrame implements Runnable{
 	private static final long serialVersionUID = 1L;
 	protected JPanel mainPanel;
-	private ArrayList<gameOfLifeCellbutton> gameGridButtons;
+	private ArrayList<CellButton> gameGridButtons;
 	
 	protected static Game gameOfLifeGame;
-	private JLabel statusLabel;
-	private JTextField ruleInput;
+	private JLabel statusLabel; //Státuskijelző címke.
+	private JTextField ruleInput; //Szabálybemeneti mező.
 	
-	private JButton addRuleButton;
-	private JButton resetButton;
-	private JButton saveStateButton;
-	private JButton loadStateButton;
+	private JButton addRuleButton; // OK gomb.
+	private JButton resetButton; // Reset gomb.
+	private JButton saveStateButton; // Save game gomb.
+	private JButton loadStateButton; // Load game gomb.
 	
-	private JLabel iterationLabel;
-	private JLabel populationLabel;
+	private JLabel iterationLabel; // Jelenlegi iteráció számát kijelző címke.
+	private JLabel populationLabel; // Jelenlegi populáció számát kijelző címke.
 	
-	private JButton stepButton;
-	private JButton autoButton;
+	private JButton stepButton; // Kézi léptető gomb.
+	private JButton autoButton; // Automata szimuláció gomb.
 	
-	private JButton x1Button;
-	private JButton x2Button;
-	private JButton x3Button;
-	private JButton x4Button;
+	private JButton x1Button; // 1x szimuláció gomb.
+	private JButton x2Button; // 2x szimuláció gomb.
+	private JButton x3Button; // 3x szimuláció gomb.
+	private JButton x4Button; // 4x szimuláció gomb.
 	
-	private int sleepTime;
-	private boolean autoSimulationAllowed;
-	
-	String simulationstatus;
-	/*
-	 * Methódusok a JUnit számára
-	 */
+	private int sleepTime; // A szimuáció iterációi közti időköz
+	private boolean autoSimulationAllowed; // Engefélyezett-e az auto szimuláció iterálása.
 	
 	/**
 	 * Step gomb lekérése
@@ -76,29 +75,67 @@ public class AppFrame extends JFrame implements Runnable{
 	 * @return
 	 */
 	public JButton getResetButton() {return this.resetButton;}
-
+	
+	/**
+	 * Visszaadja, hogy engedélyezett-e az Auto gomb megnyomása.
+	 * @return
+	 */
 	public boolean getautoEnabled(){return autoButton.isEnabled();}
+	
+	/**
+	 * Beállítja, hogy engedályezett-e az Auto gomb megnyomása.
+	 * @param b
+	 */
 	public void setautoEnabled(boolean b) {autoButton.setEnabled(b);}
 	
+	/**
+	 * Visszaadja, hogy éppen engedélyezett-e az automatikus léptetés/szimulálás.
+	 * @return
+	 */
 	public boolean getautoSimulationAllowed(){return autoSimulationAllowed;}
+	
+	/**
+	 * Beállítja, hogy engedélyezett-e az automatikus léptetés/szimulálás.
+	 * @param b
+	 */
 	public void setautoSimulationAllowed(boolean b) {autoSimulationAllowed=b;}
 	
+	/**
+	 * Két szimulált iteráció közötti időköz lekérése.
+	 * @return
+	 */
 	public int getSleepTime() {return this.sleepTime;}
+	
+	/**
+	 * Két szimulált iteráció közötti időköz beállítása.
+	 * @return
+	 */
 	public void setSleepTime(int to) {this.sleepTime=to;}
 	
-	
+	/**
+	 * Léptetés engedélyezése.
+	 */
 	private void enableStepping() {
 		this.stepButton.setEnabled(true);
 	}
 	
+	/**
+	 * Léptetés tiltása.
+	 */
 	private void disableStepping() {
 		this.stepButton.setEnabled(false);
 	}
+	
+	/**
+	 * UI cellatáblázatának frissítése.
+	 * meghívja a Game osztály iterációért felelőt methódusait, majd az eredmény alapján
+	 * átállítja a UI cellák színeit.
+	 */
 	private void Step() {
 		gameOfLifeGame.nextIteration();
 		gameOfLifeGame.applyIteration();
 		
-		for(gameOfLifeCellbutton i : gameGridButtons) {
+		for(CellButton i : gameGridButtons) {
 			if(i.getConnectedCell().isAlive()==true) i.setBackground(Color.YELLOW);
 			else i.setBackground(Color.BLACK);
 		}
@@ -110,11 +147,11 @@ public class AppFrame extends JFrame implements Runnable{
 	}
 	
 	/**
-	 * Megtiltja, hogy a felhasználó mentett jáékmenetet töltsön be, vagy állítja a cellák állapotát.
+	 * Megtiltja, hogy a felhasználó mentett jáékmenetet töltsön be, vagy állítsa a cellák állapotát.
 	 */
 	private void lockInputs() {
 		this.addRuleButton.setEnabled(false);
-		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
+		for(CellButton cellButton:gameGridButtons) {
 			cellButton.setEnabled(false);
 		}
 		saveStateButton.setEnabled(true);
@@ -127,7 +164,7 @@ public class AppFrame extends JFrame implements Runnable{
 	private void unlockInputs() {
 		disableStepping();
 		this.addRuleButton.setEnabled(true);
-		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
+		for(CellButton cellButton:gameGridButtons) {
 			cellButton.setEnabled(true);
 			cellButton.getConnectedCell().setNextiteration(false);
 			cellButton.setBackground(Color.BLACK);
@@ -137,16 +174,16 @@ public class AppFrame extends JFrame implements Runnable{
 		
 	}
 	
-	
-	public void executeAutoSimulation(){
-		
-	}
 	/**
 	 * A Swing Frame, amiben a játék UI látszik.
 	 * @param game
 	 */
 	public AppFrame(Game game) {
 		super("Game Of Life");
+		
+		ImageIcon im = new ImageIcon(this.getClass().getResource("/assets/icon.png"));
+		this.setIconImage(im.getImage());
+		
 		this.sleepTime=1000;
 		AppFrame.gameOfLifeGame=game;
 		this.setResizable(true);
@@ -230,11 +267,11 @@ public class AppFrame extends JFrame implements Runnable{
         this.setSize(windowSize);
         
         //A játékmezőt felépítő JButton elemek.
-        gameGridButtons=new ArrayList<gameOfLifeCellbutton>();
+        gameGridButtons=new ArrayList<CellButton>();
         for(int i=0;i<50;i++) {
         	for(int j=0;j<50;j++) {
         		Cell ce = new Cell();
-        		gameOfLifeCellbutton but= new gameOfLifeCellbutton(new ButtonAction(i+"+"+j));
+        		CellButton but= new CellButton(new ButtonAction(i+"+"+j));
         		gameOfLifeGame.getGameGrid().setCellByPos(i, j, ce);
         		but.setBorderPainted(false);
         		but.setText(null);
@@ -301,7 +338,6 @@ public class AppFrame extends JFrame implements Runnable{
 	}
 	/**
 	 * Az új szabály beviteléhez tartozó gomb Listenerje.
-	 * @author gutasiadam
 	 *
 	 */
     private class addRuleButtonListener implements ActionListener
@@ -354,6 +390,9 @@ public class AppFrame extends JFrame implements Runnable{
 		}
 	}
     
+    /**
+     * Az egyszeres sebességű szimulációt beállító gombhoz tartozó listener.
+     */
     private class x1ButtonListener implements ActionListener{
 
 		@Override
@@ -363,6 +402,10 @@ public class AppFrame extends JFrame implements Runnable{
     	
     }
     
+    
+    /**
+     * A kétszeres sebességű szimulációt beállító gombhoz tartozó listener.
+     */
     private class x2ButtonListener implements ActionListener{
 
 		@Override
@@ -372,6 +415,9 @@ public class AppFrame extends JFrame implements Runnable{
     	
     }
     
+    /**
+     * A háromszoros sebességű szimulációt beállító gombhoz tartozó listener.
+     */
     private class x3ButtonListener implements ActionListener{
 
 		@Override
@@ -381,6 +427,10 @@ public class AppFrame extends JFrame implements Runnable{
     	
     }
     
+    
+    /**
+     * A négyszeres sebességű szimulációt beállító gombhoz tartozó listener.
+     */
     private class x4ButtonListener implements ActionListener{
 
 		@Override
@@ -388,6 +438,10 @@ public class AppFrame extends JFrame implements Runnable{
 			setSleepTime(50);}
     }
     
+    
+    /**
+     * Az automata szimulációt állító gombhoz tartozó listener.
+     */
     private class autoButtonListener implements ActionListener{
     	public static SimulationWorker s;
     	@Override
@@ -408,6 +462,10 @@ public class AppFrame extends JFrame implements Runnable{
     	}
     }
     
+    
+    /**
+     * A kézi léptető gombhoz tartozó listener.
+     */
     private class stepButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
@@ -415,6 +473,9 @@ public class AppFrame extends JFrame implements Runnable{
     	}
     }
     
+    /*
+     * A játékállás betöltéséhez tartozó gomb listenerje.
+     */
     private class loadButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
@@ -428,7 +489,7 @@ public class AppFrame extends JFrame implements Runnable{
                 	for(int j=0;j<50;j++) {
                 		gameGridButtons.get((i+(50*j))).setConnectedCell(gameOfLifeGame.getGameGrid().getCellByPos(i, j));
                 	}}
-        		for(gameOfLifeCellbutton cellButton:gameGridButtons) {
+        		for(CellButton cellButton:gameGridButtons) {
         			if(cellButton.getConnectedCell().aliveOnNextIteration) {
         				cellButton.setBackground(Color.YELLOW);
         			}
@@ -442,6 +503,9 @@ public class AppFrame extends JFrame implements Runnable{
     	}
     }
     
+    /*
+     * A játékállás mentéséhez tartozó gomb listenerje.
+     */
     private class saveButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
@@ -450,13 +514,16 @@ public class AppFrame extends JFrame implements Runnable{
     }
     
     
+    /*
+     * A játékállás alpahelyzetbe állításához tartozó gomb listenerje.
+     */
     private class resetButtonListener implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent ae) {
     		disableStepping();
     		setautoSimulationAllowed(false);
     		autoButton.setText("Auto");
-    		for(gameOfLifeCellbutton i : gameGridButtons) {
+    		for(CellButton i : gameGridButtons) {
     			i.getConnectedCell().setNextiteration(false);
     			i.getConnectedCell().setState(false);
     		}
@@ -482,8 +549,9 @@ public class AppFrame extends JFrame implements Runnable{
 	}
 	
 	/**
-	 * 
-	 * @author gutasiadam
+	 * Automatikus szimuláció megvalósítása egy külön szálon.
+	 * Ameddig engedélyezett az automatikus szimulálás, addig automatikusan iterál, a megadott
+	 * időközökkel.
 	 * @url https://www.oreilly.com/library/view/learning-java-4th/9781449372477/ch16s05.html
 	 */
 	class SimulationWorker extends SwingWorker<String, Object> {
@@ -511,24 +579,11 @@ public class AppFrame extends JFrame implements Runnable{
 	}
 	
 }
-class gameOfLifeCellbutton extends JButton{
-	private static final long serialVersionUID = 1L;
-	private Cell connectedCell;
-	public void setConnectedCell(Cell c) {
-		this.connectedCell=c;
-	}
-	public Cell getConnectedCell() {
-		if(connectedCell!=null) {
-			return this.connectedCell;
-		}
-		return null;
-		
-	}
-	
-	public gameOfLifeCellbutton(ButtonAction bA) {
-		super(bA);
-	}
-}
+
+/**
+ * A beállítási fázis folyamán, a játékmezőn elvégzett felhasználói utasításokat
+ * kezelő listener.
+ */
 class ButtonAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
 	private static final Color OFF = Color.BLACK;
@@ -542,8 +597,7 @@ class ButtonAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-    	gameOfLifeCellbutton btn = (gameOfLifeCellbutton) e.getSource();
-    	
+    	CellButton btn = (CellButton) e.getSource();	
         Color c = btn.getBackground();
         c = c == OFF ? ON : OFF;
         if(c==OFF) {

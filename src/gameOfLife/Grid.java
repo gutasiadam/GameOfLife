@@ -1,3 +1,6 @@
+/**
+ * A játékmezőt reprezentáló osztály, mely Cellákből épül fel.
+ */
 package gameOfLife;
 
 import java.io.Serializable;
@@ -52,24 +55,6 @@ public class Grid implements Serializable {
 			Cells.get(row).set(col, c);
 		}catch(IndexOutOfBoundsException e) {
 			return;
-		}
-	}
-	
-	/**
-	 * Játékmező kirajzolása a szabványos kimenetre.
-	 */
-	public void printGrid() {
-		System.out.println("Printing grid");
-		for(int i=0;i<49;i++) {
-			for(int j=0;j<49;j++) {
-				if(Cells.get(i).get(j).isAlive()) {
-					System.out.print("X");
-				}else {
-					System.out.print(" ");
-				}
-			
-			}
-			System.out.print("\n");
 		}
 	}
 	

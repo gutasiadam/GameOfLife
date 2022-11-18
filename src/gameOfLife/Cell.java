@@ -1,8 +1,10 @@
+/**
+ * Egy cellát ( sejtet ) reprezentáló osztály.
+ */
 package gameOfLife;
 import java.io.Serializable;
 import java.util.HashMap;
 public class Cell implements Serializable {
-	HashMap<Direction, Cell> neighbors;
 	boolean state=false;
 	boolean aliveOnNextIteration;
 	

@@ -1,3 +1,7 @@
+/**
+ * A játék beállított szabályait, játékmezőjét, statisztikáit egybefogó osztály
+ * @author gutasiadam
+ */
 package gameOfLife;
 
 import java.io.File;
@@ -7,7 +11,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Game implements Serializable{
 	private int iteration=0;
@@ -15,10 +18,7 @@ public class Game implements Serializable{
 	private int[] bornRule;
 	private int[] surviveRule;
 	private Grid gameGrid;
-	
-	/*private void autorun() {
-		for(int i=0;)
-	}*/
+
 
 	public Game(Grid grid) {
 		this.gameGrid = grid;
@@ -26,7 +26,6 @@ public class Game implements Serializable{
 	
 	public Game() {
 		this.gameGrid=new Grid(50);
-		//System.out.println("Game Init!");
 	}
 	
 	/**
@@ -83,6 +82,11 @@ public class Game implements Serializable{
 		}
 	}
 	
+	/**
+	 * Szabály validálása regex segítségével.
+	 * @param input
+	 * @return
+	 */
 	public boolean validateRule(String input) {
 		return(input.matches("B{1}[0-9]+\\/S{1}[0-9]+"));
 	}
@@ -130,8 +134,6 @@ public class Game implements Serializable{
 	 * @param b
 	 */
 	public void saveGame() {
-		System.out.println("Saving");
-		gameGrid.printGrid();
 		try {
 		FileOutputStream fout=new FileOutputStream("gameOfLifeGameState.txt");    
 		ObjectOutputStream out=new ObjectOutputStream(fout);    
@@ -147,7 +149,8 @@ public class Game implements Serializable{
 	}
 	
 	/**
-	 * Előző mentés betöltése
+	 * Előző játékmenet betöltése
+	 * @return
 	 */
 	public boolean loadGame() {
 		try {
@@ -161,7 +164,6 @@ public class Game implements Serializable{
 			    iteration=(int)in.readObject();;
 			    population=(int)in.readObject();;
 			    in.close();
-			    gameGrid.printGrid();
 			}else {
 				return false;
 			}
@@ -176,38 +178,28 @@ public class Game implements Serializable{
 	 * Játékmező lekérése.
 	 * @param b
 	 */
-	public Grid getGameGrid() {
-		return this.gameGrid;
-	}
+	public Grid getGameGrid() {return this.gameGrid;}
 	
 	/**
 	 * Populáció értékének növelése.
 	 * @param b
 	 */
-	public void increasePopulation() {
-		this.population++;
-	}
+	public void increasePopulation() {this.population++;}
 	
 	/**
 	 * Populáció számának lekérése.
 	 * @param b
 	 */
-	public int getPopulation() {
-		return this.population;
-	}
+	public int getPopulation() {return this.population;}
 	
 	/**
 	 * Iteráció számának lekérése.
 	 * @param b
 	 */
-	public int getIteration() {
-		return this.iteration;
-	}
+	public int getIteration() {return this.iteration;}
 	
 	/**
 	 * Iteráció visszaállítása.
 	 */
-	public void resetIteration() {
-		this.iteration=0;
-	}
+	public void resetIteration() {this.iteration=0;}
 }
